@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 import simplejson
 
 from settings import PING_TIMEOUT_SECONDS
+#import cron # this is my cron module+function, nothing built-in
 
 from retainer.models import *
 from retainer.utils.request_utils import checkRequestParams
@@ -30,6 +31,9 @@ def make(request):
            done = False, \
            invoked = False)
        resv.save()
+       
+       #cron.cron()
+       
        return HttpResponse(resv.id)
    except ProtoHit.DoesNotExist:
        return HttpResponse('ProtoHit.DoesNotExist')

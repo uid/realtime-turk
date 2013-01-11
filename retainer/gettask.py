@@ -29,13 +29,24 @@ def getTask(request, assignment_id):
         proto = current.hit_id.proto
         resv = current.hit_id.reservation
         
-        siblings = resv.siblings
+        siblings = resv.siblings.filter(done=False, invoked=True)
         
-        if resv.invoked and len(resv.workers) <= resv.assignments:
+        if resv.invoked and not resv.done and len(resv.workers) <= resv.assignments:
             tid = resv.foreign_id
             current.task_id = tid
             taskInfo = { 'start': True, 'taskID': int(tid) }
             current.save()
+        elif len(siblings) > 0:
+            assigned = False
+            for sibling in siblings:
+                if len(sibling.workers) <= sibling.assignments:
+                    tid = sibling.foreign_id
+                    current.task_id = tid
+                    taskInfo = { 'start': True, 'taskID': int(tid) }
+                    current.save()
+                    assigned = True
+            if not assigned:
+                taskInfo = { 'start': False }
         else:
             taskInfo = { 'start': False }
 

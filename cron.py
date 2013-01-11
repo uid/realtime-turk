@@ -6,23 +6,26 @@ import time
 import random
 import os
 
-from boto.mturk.qualification import *
 
+from boto.mturk.qualification import *
 from django.core.management import setup_environ
 import settings
-setup_environ(settings)
+if __name__ == '__main__':
+    setup_environ(settings)
 
+#FIXME: 
 from retainer.models import *
 from retainer.utils.mt_connection import *
 from retainer.utils.external_hit import ExternalHit
 from retainer.utils.timeutils import total_seconds, unixtime
 from retainer.work_approver import expire_all_hits
 from retainer.reservation import unfulfilledReservationsForProto
-    
+
+
 # this is the 'cron' script entry point
 def cron():
     mt_conn = get_mt_conn()
-    print datetime.now().strftime("%m.%d.%Y %I:%M:%S %p") + ' --- retainer cron job ---'
+    print datetime.utcnow().strftime("%m.%d.%Y %I:%M:%S %p") + ' --- retainer cron job ---'
     protos = ProtoHit.objects.all()
     
     for proto in protos:
@@ -30,6 +33,10 @@ def cron():
         for reservation in reservations:
             numOnRetainer = len(reservation.workers)
             print 'num on retainer: ' + str(numOnRetainer) + ' for ' + str(reservation)
+            
+            if unixtime(datetime.now()) > (reservation.start_time + settings.RESERVATION_TIMEOUT_MINUTES):
+                print 'expired, not posting more HITs for this reservation'
+                break
             
             # postHITs for this reservation, if needed
             if numOnRetainer < reservation.assignments:
