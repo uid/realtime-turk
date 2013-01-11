@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+ 
+<head>
+<title>Retainer test</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src="turkit-lib.js"></script>
+<script src="retainer.js"></script>
+<script type="text/javascript">
+$(init)
+
+var aid, wid, hid
+
+function init(){
+	var p = getURLParams()
+	hid = p.hitId
+	aid = p.assignmentId
+	wid = p.workerId
+	
+	trace('assignment: ' + aid)
+	
+	if(aid != 'ASSIGNMENT_ID_NOT_AVAILABLE'){
+		Retainer.init(wid, aid, hid)
+	}
+	
+	Retainer.hasWork = function(data){
+		trace('Has work:' + data)
+		trace(data.taskID)
+	}
+}
+
+function trace(s){
+	$('#output').append(s + '\n')
+}
+</script>
+</head>
+ 
+<body>
+	<pre id="output">
+		
+	</pre>
+</body>
+</html>

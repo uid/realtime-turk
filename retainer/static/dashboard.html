@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Retainer Dashboard</title>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script src="dashboard.js"></script>
+    </head>
+    <body>
+        <h1>Retainer Dashboard</h1>
+        <h3>ProtoHITs</h3>
+        <div>
+            <input type="button" id="proto-new" value="New" />
+        </div>
+        <ul id="protos">
+            
+        </ul>
+        <h3>Reservations</h3>
+        <div>
+            <input type="button" id="resv-new" value="New" />
+            (proto) id: <input type="number" id="resv-id" value="1" />
+            foreignID: <input type="number" id="resv-foreignID" value="1" />
+            delay: <input type="number" id="resv-delay" value="60" />
+            assignments: <input type="number" id="resv-numAssignments" value="5" />
+            payload?: <input type="text" id="resv-payload" value="" />
+        </div>
+        <ul id="reservations">
+            
+        </ul>
+    </body>
+</html>
