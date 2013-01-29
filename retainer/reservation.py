@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-import simplejson
+import simplejson as json
 
 from settings import PING_TIMEOUT_SECONDS
 #import cron # this is my cron module+function, nothing built-in
@@ -87,11 +87,33 @@ def finish(request):
         return HttpResponse('OK')
     except WorkReservation.DoesNotExist:
         return HttpResponse('WorkReservation.DoesNotExist')
+        
+@csrf_exempt
+def finishAll(request):
+    # mark a reservation as successfully finished
+    if not checkRequestParams(request, ['apiKey']):
+        return HttpResponse('Bad params')
+    
+    resvs = WorkReservation.objects.all()
+    for resv in resvs:
+        resv.done = True
+        resv.save()
+    return HttpResponse('OK')
 
 @csrf_exempt
 def list(request):
     # query this server to get info about all reservations being serviced
-    return HttpResponse('Unimplemented')
+    if not checkRequestParams(request, ['apiKey']):
+        return HttpResponse('Bad params')
+    
+    resvs = []
+    
+    for resv in WorkReservation.objects.all():
+        resvs.append(resv.objectify)
+        
+    data = json.dumps(resvs)
+    
+    return HttpResponse(data)
 
 def unfulfilledReservations():
     return WorkReservation.objects.filter(done = False)

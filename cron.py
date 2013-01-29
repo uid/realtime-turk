@@ -34,7 +34,7 @@ def cron():
             numOnRetainer = len(reservation.workers)
             print 'num on retainer: ' + str(numOnRetainer) + ' for ' + str(reservation)
             
-            if unixtime(datetime.now()) > (reservation.start_time + settings.RESERVATION_TIMEOUT_MINUTES):
+            if unixtime(datetime.now()) > (reservation.start_time + settings.RESERVATION_TIMEOUT_MINUTES * 60):
                 print 'expired, not posting more HITs for this reservation'
                 break
             

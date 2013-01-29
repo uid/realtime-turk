@@ -1,7 +1,10 @@
 from django.db import models
 from datetime import datetime, timedelta
+from decimal import *
 
 from settings import PING_TIMEOUT_SECONDS
+
+import simplejson as json
 
 from retainer.utils.timeutils import unixtime
 from retainer.utils.transaction import flushTransaction
@@ -58,6 +61,15 @@ class ProtoHit(models.Model):
     approval_rating =       models.IntegerField(default=0)
     worker_locale =         models.CharField(max_length=255, blank=True)
     
+    @property
+    def objectify(self):
+        return { \
+            'id': self.id, \
+            'hitTypeID': self.hit_type_id, \
+            'title': self.title, \
+            'url': self.url
+        }
+    
     def __unicode__(self):
         return self.hit_type_id + u'::' + unicode(self.title)
 
@@ -84,11 +96,24 @@ class WorkReservation(models.Model):
             hit_id__reservation = self, \
             task_id = None).distinct()
         return waitingWorkers
+        
+    @property
+    def objectify(self):
+        return { \
+            'id': self.id, \
+            'proto': self.proto.objectify, \
+            'foreignID': self.foreign_id, \
+            'payload': self.payload, \
+            'startTime': int(self.start_time * 1000), \
+            'assignments': self.assignments, \
+            'invoked': self.invoked, \
+            'done': self.done
+        }
     
     def __unicode__(self):
         status = u'Complete - ' if self.done else u'Incomplete - '
         status2 = u'Invoked - ' if self.invoked else u'Waiting - '
-        return status + status2 + u'reservation for ' + unicode(self.assignments) + u' workers with foreign id: ' + unicode(self.foreign_id)
+        return status + status2 + unicode(self.proto.hit_type_id) + u':: reservation for ' + unicode(self.assignments) + u' workers with foreign id: ' + unicode(self.foreign_id)
     
 class Event(models.Model):
     assignment =            models.ForeignKey('Assignment')
