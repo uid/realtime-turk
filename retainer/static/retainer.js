@@ -1,6 +1,6 @@
 var 
-	PING_ENDPOINT = 'http://crowdy.csail.mit.edu:8000/ping/',
-	WORK_ENDPOINT = 'http://crowdy.csail.mit.edu:8000/gettask/',
+	PING_ENDPOINT = 'http://crowdy.csail.mit.edu/retainer/ping/',
+	WORK_ENDPOINT = 'http://crowdy.csail.mit.edu/retainer/gettask/',
 	PING_INTERVAL = 2500,
 	WORK_INTERVAL = 1000
 
@@ -40,7 +40,8 @@ var Retainer = {
 					setTimeout(Retainer.checkForWork, WORK_INTERVAL, assignment_id)
 				}
 				console.log(data)
-			} 
+			},
+			dataType: 'json'
 		})
 	},
 	
