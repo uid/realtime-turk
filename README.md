@@ -1,6 +1,8 @@
 Retainer Model
 ==============
 
+[setup]:Setup
+
 Setup
 -----
 
@@ -73,12 +75,16 @@ Setup
 API
 ---
 
+The following method descriptions explain how to interface with the retainer server so that you can integrate it with your applications.  
+
+---
+
 ```
 gettask/assignment/<assignment_id>
 retainer/gettask/assignment/<assignment_id>
 ```
 
-Called by retainer.js.
+Called by retainer.js.  Used to poll to look for new work.
 
 ---
 
@@ -87,7 +93,7 @@ ping/worker/<worker_id>/assignment/<assignment_id>/hit/<hit_id>/event/<ping_type
 retainer/ping/worker/<worker_id>/assignment/<assignment_id>/hit/<hit_id>/event/<ping_type>
 ```
 
-Called by retainer.js.
+Called by retainer.js.  Keeps track of active workers sitting on an accepted assignment page.
 
 ---
 
@@ -96,7 +102,33 @@ puttask
 retainer/puttask
 ```
 
-Used to create ProtoHITs.
+**POST Params**
+
+- _json_: A JSON description of the ProtoHIT that should have the following shape:
+```
+title:String,
+description:String,
+keywords:String,
+url:String,
+frame_height:String,
+reward:Number,
+assignment_duration:int,
+lifetime:int,
+max_assignments:int,
+auto_approval_delay:int,
+worker_locale:String,
+approval_rating:int
+```
+
+- (_apiKey_): Optional access guard.
+
+**Result**
+
+_id_: The id of the ProtoHIT being created.
+
+**Description**
+
+Used to create [ProtoHITs][setup].  The names of the properties in the JSON object correspond to similar MTurk HIT parameters.
 
 ---
 
@@ -123,6 +155,24 @@ reservation/make
 retainer/reservation/make
 ```
 
+**POST Params**
+
+- _id_: The id of a ProtoHIT to associate this reservation with. (Basically, this associates a reservation with some specific HIT settings that you've already defined.)
+	
+- _foreignID_: An ID that can be used to refer to an object in an external database.  This ID is passed to individual worker pages via retainer.js.
+
+- _delay_: A delay, in seconds, before work for the reservation is _expected_ to be available.  Doesn't need to be a guarantee, since this is only (planned to be) used for HIT posting optimization.
+
+- _numAssignments_: The number of workers you expect that it will take to complete the reservation.  Used for optimizing HIT posting.
+
+- (_apiKey_): Optional access guard.
+
+**Result**
+
+_id_: The ID of the newly-created WorkReservation.
+
+**Description**
+
 Creates a WorkReservation.  Indicates that work is incoming, though not necessarily available yet.  Calling 
 this method will pre-emptively start posting HITs, though workers will not be directed to the actual task yet.
 
@@ -133,6 +183,18 @@ reservation/cancel
 retainer/reservation/cancel
 ```
 
+**POST Params**
+
+- _id_: The ID of the WorkReservation to cancel.
+
+- (_apiKey_): Optional access guard.
+
+**Result**
+
+`OK` on success, error message otherwise.
+
+**Description**
+
 Cancels a reservation.  May be useful for when the end-user makes a mistake or an app crashes.
 
 ---
@@ -141,6 +203,18 @@ Cancels a reservation.  May be useful for when the end-user makes a mistake or a
 reservation/invoke
 retainer/reservation/invoke
 ```
+
+**POST Params**
+
+- _id_: The ID of the WorkReservation to invoke.
+
+- (_apiKey_): Optional access guard.
+
+**Result**
+
+`OK` on success, error message otherwise.
+
+**Description**
 
 Indicates that a reservation is now being called upon to supply workers to an incoming task.  
 
@@ -151,13 +225,35 @@ reservation/finish
 retainer/reservation/finish
 ```
 
-Marks a reservation as complete, so no more workers are sent to it.
+**POST Params**
+
+- _id_: The ID of the WorkReservation to operate on.
+
+- (_apiKey_): Optional access guard.
+
+**Result**
+
+`OK` on success, error message otherwise.
+
+**Description**
+
+Marks a reservation as complete, so no more workers are sent to it.  Different than `cancel` only the way that existing HITs are treated.
 
 ---
 ```
 reservation/list
 retainer/reservation/list
 ```
+
+**Params**
+
+- (_apiKey_): Optional access guard.
+
+**Result**
+
+JSON array of serialized WorkReservations. The associated ProtoHITs are included in the serialization.
+
+**Description**
 
 Generates JSON to list current reservations and ProtoHITs.
 
@@ -167,4 +263,14 @@ reservation/finish/all
 retainer/reservation/finish/all
 ```
 
-Convenience API to mark all 
+**POST Params**
+
+- (_apiKey_): Optional access guard.
+
+**Result**
+
+`OK` on success, error message otherwise.
+
+**Description**
+
+Convenience API to mark all reservations as complete, so that no more HITs are posted or kept active.  Saves $$.
