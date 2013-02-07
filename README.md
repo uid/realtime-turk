@@ -240,6 +240,27 @@ retainer/reservation/finish
 Marks a reservation as complete, so no more workers are sent to it.  Different than `cancel` only the way that existing HITs are treated.
 
 ---
+
+```
+reservation/unfinish
+retainer/reservation/unfinish
+```
+
+**POST Params**
+
+- _id_: The ID of the WorkReservation to operate on.
+
+- (_apiKey_): Optional access guard.
+
+**Result**
+
+`OK` on success, error message otherwise.
+
+**Description**
+
+Marks a reservation as incomplete… this is probably only useful for debugging applications.
+
+---
 ```
 reservation/list
 retainer/reservation/list
