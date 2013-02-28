@@ -157,7 +157,7 @@ retainer/reservation/make
 
 **POST Params**
 
-- _id_: The id of a ProtoHIT to associate this reservation with. (Basically, this associates a reservation with some specific HIT settings that you've already defined.)
+- _hitType_: The HIT type of a ProtoHIT to associate this reservation with. (Basically, this associates a reservation with some specific HIT settings that you've already defined.)
 	
 - _foreignID_: An ID that can be used to refer to an object in an external database.  This ID is passed to individual worker pages via retainer.js.
 

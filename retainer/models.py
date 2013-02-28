@@ -42,12 +42,14 @@ class Hit(models.Model):
     auto_approval_delay =   models.IntegerField(null=True, blank=True)
     approval_rating =       models.IntegerField(default=0)
     worker_locale =         models.CharField(max_length=255, blank=True)
+    paid =                  models.BooleanField(default=False)
+    removed =               models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.hit_id
 
 class ProtoHit(models.Model):
-    hit_type_id =           models.CharField(max_length=255, blank=True)
+    hit_type_id =           models.CharField(max_length=255, null=False, unique=True)
     title =                 models.TextField(blank=True)
     description =           models.TextField(blank=True)
     keywords =              models.TextField(blank=True)

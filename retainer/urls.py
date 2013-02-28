@@ -32,6 +32,9 @@ urlpatterns = patterns('',
     url(r'^reservation/finish$', 'retainer.reservation.finish'),
     url(r'^retainer/reservation/finish$', 'retainer.reservation.finish'),
     
+    url(r'^reservation/unfinish$', 'retainer.reservation.unfinish'),
+    url(r'^retainer/reservation/unfinish$', 'retainer.reservation.unfinish'),
+    
     url(r'^reservation/list$', 'retainer.reservation.list'),
     url(r'^retainer/reservation/list$', 'retainer.reservation.list'),
     

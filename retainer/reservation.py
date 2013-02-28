@@ -15,12 +15,12 @@ from retainer.utils.timeutils import unixtime
 @csrf_exempt
 def make(request):
    # initialize a WorkReservation, for some time in the future
-   if not checkRequestParams(request, ['apiKey', 'id', 'foreignID', 'delay', 'numAssignments']):
+   if not checkRequestParams(request, ['apiKey', 'hitType', 'foreignID', 'delay', 'numAssignments']):
        return HttpResponse('Bad params')
    
    params = request.POST
    try:
-       proto = ProtoHit.objects.get(id=int(params['id']))
+       proto = ProtoHit.objects.get(hit_type_id=params['hitType'])
        foreign_id = int(params['foreignID'])
        payload = params['payload'] if 'payload' in params else ''
        resv = WorkReservation(proto = proto, \
@@ -83,6 +83,21 @@ def finish(request):
     try:
         resv = WorkReservation.objects.get(id = int(params['id']))
         resv.done = True
+        resv.save()
+        return HttpResponse('OK')
+    except WorkReservation.DoesNotExist:
+        return HttpResponse('WorkReservation.DoesNotExist')
+        
+@csrf_exempt
+def unfinish(request):
+    # mark a reservation as "un"-finished... typically for debugging
+    if not checkRequestParams(request, ['apiKey', 'id']):
+        return HttpResponse('Bad params')
+    
+    params = request.POST
+    try:
+        resv = WorkReservation.objects.get(id = int(params['id']))
+        resv.done = False
         resv.save()
         return HttpResponse('OK')
     except WorkReservation.DoesNotExist:

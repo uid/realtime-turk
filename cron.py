@@ -25,7 +25,8 @@ from retainer.reservation import unfulfilledReservationsForProto
 # this is the 'cron' script entry point
 def cron():
     mt_conn = get_mt_conn()
-    print datetime.utcnow().strftime("%m.%d.%Y %I:%M:%S %p") + ' --- retainer cron job ---'
+    cron_start = datetime.utcnow()
+    print cron_start.strftime("%m.%d.%Y %I:%M:%S %p") + ' --- retainer cron job ---'
     protos = ProtoHit.objects.all()
     
     for proto in protos:
