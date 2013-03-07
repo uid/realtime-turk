@@ -51,11 +51,12 @@ Setup
 	
 	If you'd like, create an API in the admin interface.  This adds an `apiKey` parameter to all API methods that will guard access to those pieces of functionality.
 	
-*	**Create a cron job to run cron.py**
+*	**Create a cron/boot job to start the HIT-posting daemon**
 	
-	cron.py should run every minute.  It periodically posts HITs for active reservations.  A typical crontab entry for this file looks like this: 
+	You'll need python-daemon from pypi to run postHITs.py.
 	
-	`* * * * * /path/to/cron.py >> /path/to/retainer.log 2>&1`
+	To start it at boot, put this in your crontab:
+	`@reboot /path/to/postHITs.py >> /path/to/logfile.log 2>&1`
 	
 *	**Integrate retainer.js into your landing page**
 	
@@ -118,6 +119,30 @@ max_assignments:int,
 auto_approval_delay:int,
 worker_locale:String,
 approval_rating:int
+```
+
+Example usage, from jQuery:
+
+```javascript
+$.post('http://server/retainer/puttask', {
+	json: JSON.stringify({
+	    hit_type_id: 'Dashboard',
+	    title: 'Dashboard HIT',
+	    description: 'desc',
+	    keywords: 'keys',
+	    url: 'http://server/retainer/static/test.html',
+	    frame_height: 1200,
+	    reward: 0.05,
+	    assignment_duration: 350,
+	    lifetime: 2400,
+	    max_assignments: 2,
+	    auto_approval_delay: 5000,
+	    worker_locale: 'US',
+	    approval_rating: 92
+	})
+}, function(data){
+    console.log('got', data) // some response
+})
 ```
 
 - (_apiKey_): Optional access guard.

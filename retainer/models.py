@@ -53,15 +53,15 @@ class ProtoHit(models.Model):
     title =                 models.TextField(blank=True)
     description =           models.TextField(blank=True)
     keywords =              models.TextField(blank=True)
-    url =                   models.CharField(max_length=1023)
+    url =                   models.CharField(max_length=1023, default='http://google.com')
     frame_height =          models.IntegerField(default = 1200)
-    reward =                models.DecimalField(max_digits=6, decimal_places=2)
-    assignment_duration =   models.IntegerField()
-    lifetime =              models.IntegerField()
-    max_assignments =       models.IntegerField()
+    reward =                models.DecimalField(max_digits=6, decimal_places=2, default=Decimal('0.05'))
+    assignment_duration =   models.IntegerField(default=600)
+    lifetime =              models.IntegerField(default=3600)
+    max_assignments =       models.IntegerField(default=1)
     auto_approval_delay =   models.IntegerField(null=True, blank=True, default=86400)
     approval_rating =       models.IntegerField(default=0)
-    worker_locale =         models.CharField(max_length=255, blank=True)
+    worker_locale =         models.CharField(max_length=255, blank=True, default='')
     
     @property
     def objectify(self):

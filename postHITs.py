@@ -3,6 +3,7 @@
 from optparse import OptionParser
 from datetime import datetime, timedelta
 import time
+import daemon
 
 from boto.mturk.qualification import *
 from django.core.management import setup_environ
@@ -45,7 +46,7 @@ def postHITs():
             
                 if unixtime(datetime.now()) > (reservation.start_time + settings.RESERVATION_TIMEOUT_MINUTES * 60):
                     print 'not yet expiring: ' + str(reservation)
-                    #break
+                    break
                 
                 # how many HITs are we already maintaining for this reservation?
                 existing_hits = Hit.objects.filter(reservation = reservation, removed = False)
@@ -125,4 +126,5 @@ def postHIT(mt_conn, resv, seq):
         print "Got exception posting HIT:\n" + str(e)
 
 if __name__ == '__main__':
-    forever()
+    with daemon.DaemonContext():
+        forever()
