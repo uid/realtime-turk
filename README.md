@@ -201,6 +201,19 @@ _id_: The ID of the newly-created WorkReservation.
 Creates a WorkReservation.  Indicates that work is incoming, though not necessarily available yet.  Calling 
 this method will pre-emptively start posting HITs, though workers will not be directed to the actual task yet.
 
+Example:
+
+```javascript
+$.post('http://server/retainer/reservation/make', {
+    hitType: 'FCSearch',
+	foreignID: 12345,
+	delay: 0,
+	numAssignments: 3
+}, function(data){
+    console.log('got', data) // the ID
+})
+```
+
 ---
 
 ```
