@@ -8,7 +8,7 @@ body {
 h1 {
     font-size: 40pt;
     font-weight: lighter;
-    margin-top: 0;
+    margin-top: 0.1in;
     margin-bottom: 0.1em;
 }
 
@@ -17,27 +17,30 @@ h2 {
     font-weight: lighter;
 }
 
-ul {
-    list-style: none;
+.left {
+	margin-left: 0.1in;
 }
 
 .resv-item {
     opacity: 1;
     background-color: #00c7ff;
     color: #005f92;
-    margin: 1em 0.5em;
-    padding: 0.5em;
+    margin: 0.7em 0.5em;
+    padding: 0.4em;
     border-radius: 0.75em;
-    -webkit-transition: opacity .5s ease-in, max-height .5s ease-in;
+    -webkit-transition: background-color .75s ease-in, color .75s ease-in;
+	-moz-transition: background-color .75s ease-in, color .75s ease-in;
+	-o-transition: background-color .75s ease-in, color .75s ease-in;
+	transition: background-color .75s ease-in, color .75s ease-in;
     max-height: 2em;
 }
 
-.hidden {
-    opacity: 0;
-    max-height: 0px;
+.X-hidden {
+    background-color: red;
+   	color: black;
 }
 
-.cell {
+.X-cell {
     white-space: nowrap;
     max-width: 25em;
     min-width: 25em;

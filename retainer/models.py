@@ -108,6 +108,7 @@ class WorkReservation(models.Model):
             'payload': self.payload, \
             'startTime': int(self.start_time * 1000), \
             'assignments': self.assignments, \
+            'workers': len(self.workers), \
             'invoked': self.invoked, \
             'done': self.done
         }

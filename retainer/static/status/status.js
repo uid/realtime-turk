@@ -1,7 +1,8 @@
 var
-	server = 'http://crowdy.csail.mit.edu:8000/',
+	server = 'http://crowdy.csail.mit.edu/retainer/',
 	reservations = [],
 	reservationMap = {},
+	hitTypes = []
 	snowman = '\u2603'
 
 $(init)
@@ -13,9 +14,30 @@ function init(){
 	$('#btn-complete-all-resvs').click(onClickMarkAll)
 }
 
-function onClickMarkAll(){
-	$.get(server + 'reservation/finish/all', function(){
+function onClickMarkAll(type){
+	$.post(server + 'reservation/finish/all', { hitType: typeof type == 'string' ? type : '' }, function(){
 		updateData()
+	})
+}
+
+function updateHITTypes(){
+	var types = $.unique($.unique($.map(reservations, function(e){ return e.proto.hitTypeID })))
+	if($(types).not(hitTypes).length || $(hitTypes).not(types).length){
+		// then the types have changed
+		$('.hitType-btn').remove()
+		$('#controls').append($.map(types, function(e){ return hitTypeBtn(e) }))
+		hitTypes = types
+	}
+}
+
+function hitTypeBtn(type){
+	return $('<input />', {
+		type: 'button',
+		class: 'span2 hitType-btn',
+		value: type,
+		click: function(e){
+			onClickMarkAll(type)
+		}
 	})
 }
 
@@ -39,6 +61,7 @@ function onReservationsInit(data){
 	data = JSON.parse(data).reverse()
 	if(!(data instanceof Array)) throw 'retainer server down'
 	addReservations(data)
+	updateHITTypes()
 }
 
 function onReservationsUpdate(data){
@@ -51,6 +74,8 @@ function onReservationsUpdate(data){
 	if(cmp.added.length > 0) addReservations(cmp.added)
 	if(cmp.deleted.length > 0) removeReservations(cmp.deleted)
 	if(cmp.modified.length > 0) modifyReservations(cmp.modified)
+	
+	updateHITTypes()
 }
 
 function addReservations(resvs){
@@ -69,7 +94,6 @@ function removeReservations(resvs){
 
 function removeReservation(resv){
 	var elem = resvElem(resv)
-	console.log('removing', resv, elem)
 	delete reservationMap[hash(resv)]
 	elem.remove() // may want to do an animation
 }
@@ -81,63 +105,63 @@ function modifyReservations(resvs){
 		
 		var oldElem = resvElem(old)
 		var newElem = htmlReservation(current)
-		oldElem.replaceWith(newElem)
+		$(oldElem).replaceWith(newElem)
 		delete reservationMap[hash(old)]
 		reservationMap[hash(current)] = current
 		
 		reservations.splice(reservations.indexOf(old), 1, current)
 		
 		// animate
-		forceCSS(newElem[0], 'opacity')
-		newElem.removeClass('hidden')
+		forceCSS(newElem[0], 'color')
+		newElem.removeClass('X-hidden')
 	}
 }
 
 function addReservation(r){
 	var li = htmlReservation(r)
-	$('#reservations').append(li)
+	$('#reservations').prepend(li)
 	reservationMap[hash(r)] = r
 	forceCSS(li[0], 'opacity')
-	li.removeClass('hidden')
+	li.removeClass('X-hidden')
 }
 
 function htmlReservation(r){
 	var id = hash(r)
-	var li = $('<li />', {
-		class: 'resv-item hidden',
+	var li = $('<div />', {
+		class: 'row resv-item X-hidden',
 		'data-hash': id
 	})
 	
-	var ids = $('<span />', {
-		class: 'cell resv-ids',
+	var ids = $('<div />', {
+		class: 'span2 cell resv-ids',
 		text: r.foreignID + ' (' + r.id + ')'
 	})
 	
-	var protoInfo = $('<span />', {
-		class: 'cell resv-proto',
+	var protoInfo = $('<div />', {
+		class: 'span2 cell resv-proto',
 		text: r.proto.hitTypeID
 	})
 	
-	var timeLeft = $('<span />', {
-		class: 'cell resv-time',
+	var timeLeft = $('<div />', {
+		class: 'span3 cell resv-time',
 		text: new Date(r.startTime).toString().replace(/GMT.*/, '').substring(4)
 	})
 	
-	var assignments = $('<span />', {
-		class: 'cell resv-assignments',
-		text: snowman.times(r.assignments)
+	var assignments = $('<div />', {
+		class: 'span2 cell resv-assignments',
+		text: snowman.times(r.workers) + ' / ' + r.assignments
 	})
 	
-	var invoked = $('<span />', {
-		class: 'cell bool resv-invoked'
+	var invoked = $('<div />', {
+		class: 'span1 cell bool resv-invoked'
 	}).click(function(e){
 		r.invoked ? null : invokeReservation(r)
 	}).append($('<input />', { 
 		type: 'button', value: 'Invoke' + (r.invoked ? 'd' : ' '), disabled: r.invoked
 	}))
 	
-	var done = $('<span />', {
-		class: 'cell bool resv-done',
+	var done = $('<div />', {
+		class: 'span2 cell bool resv-done',
 		text: 'Complete?: '
 	}).append($('<input />', { type: 'checkbox', checked: r.done } ))
 	.click(function(e){
@@ -200,7 +224,7 @@ function compareReservations(old, current){
 	function has(list, resv){
 		for(var i = 0; i < list.length; ++i){
 			var elem = list[i]
-			if(elem.id == resv.id) return hash(elem) == hash(resv) ? true: elem
+			if(elem.id == resv.id) return hash(elem) == hash(resv) ? true : elem
 		}
 		return false
 	}
@@ -209,7 +233,7 @@ function compareReservations(old, current){
 // Convenience functions.
 
 function resvElem(r){
-	return $('li[data-hash="' + hash(r) + '"]')
+	return $('div[data-hash="' + hash(r) + '"]')
 }
 
 function elemResv($e){
@@ -224,7 +248,7 @@ String.prototype.times = function(n){
 
 function hash(obj){
 	// ridiculously slow to use SHA3 so often.  guess I shouldn't be surprised
-	return /*CryptoJS.SHA3(*/JSON.stringify(obj)/*)*/.toString()
+	return /*CryptoJS.SHA3(*/JSON.stringify(obj)/*).toString()*/
 }
 
 function forceCSS(elem, prop){

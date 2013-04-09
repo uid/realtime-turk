@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 from retainer.utils.timeutils import unixtime
 
 # Get a task for the worker, or assign one if we can
-@csrf_exempt #TODO: michael suggests: @commit_on_success
+@csrf_exempt # michael suggests: @commit_on_success
 def getTask(request, assignment_id):
     # find out whether the worker has already been assigned a task. if so, just return that task.
     current_assignments = Assignment.objects.filter(assignment_id = assignment_id)

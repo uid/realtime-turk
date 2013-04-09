@@ -6,6 +6,7 @@
 		<meta content="Status dashboard for retainer tasks." name="description">
 		<meta content="Retainer Status" name="title">
 		<title>Retainer Status</title>
+		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
  	   	<link href="status.css" rel="stylesheet" type="text/css"></link>
 		<script type="text/javascript">
 		  (function() {
@@ -21,12 +22,17 @@
 		<script src="status.js"></script>
 	</head>
 	<body>
-		<h1>Retainer Status</h1>
-		<p>
-			Info about jobs on retainer.
+		<h1 class="left">Retainer Status</h1>
+		<p class="left">
+			<em>Info about jobs on retainer.</em>
 		</p>
-		<h2>Reservations</h2>
-		<ul id="reservations"></ul>
-		<input type="button" id="btn-complete-all-resvs" value="Mark all as Complete" />
+		
+		<h2 class="left">Reservations</h2>
+		
+		<div id="controls" class="left row">
+			<div class="span2">Mark complete: </div>
+			<input type="button" id="btn-complete-all-resvs" class="span2" value="All" />
+		</div>
+		<div id="reservations"></div>
 	</body>
 </html>

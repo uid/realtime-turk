@@ -145,7 +145,7 @@ $.post('http://server/retainer/puttask', {
 })
 ```
 
-- (_apiKey_): Optional access guard.
+- _apiKey_: Optional access guard.
 
 **Result**
 
@@ -190,7 +190,7 @@ retainer/reservation/make
 
 - _numAssignments_: The number of workers you expect that it will take to complete the reservation.  Used for optimizing HIT posting.
 
-- (_apiKey_): Optional access guard.
+- _apiKey_: Optional access guard.
 
 **Result**
 
@@ -225,7 +225,7 @@ retainer/reservation/cancel
 
 - _id_: The ID of the WorkReservation to cancel.
 
-- (_apiKey_): Optional access guard.
+- _apiKey_: Optional access guard.
 
 **Result**
 
@@ -246,7 +246,7 @@ retainer/reservation/invoke
 
 - _id_: The ID of the WorkReservation to invoke.
 
-- (_apiKey_): Optional access guard.
+- _apiKey_: Optional access guard.
 
 **Result**
 
@@ -267,7 +267,7 @@ retainer/reservation/finish
 
 - _id_: The ID of the WorkReservation to operate on.
 
-- (_apiKey_): Optional access guard.
+- _apiKey_: Optional access guard.
 
 **Result**
 
@@ -288,7 +288,7 @@ retainer/reservation/unfinish
 
 - _id_: The ID of the WorkReservation to operate on.
 
-- (_apiKey_): Optional access guard.
+- _apiKey_: Optional access guard.
 
 **Result**
 
@@ -306,7 +306,7 @@ retainer/reservation/list
 
 **Params**
 
-- (_apiKey_): Optional access guard.
+- _apiKey_: Optional access guard.
 
 **Result**
 
@@ -324,7 +324,8 @@ retainer/reservation/finish/all
 
 **POST Params**
 
-- (_apiKey_): Optional access guard.
+- _hitType_: Filter to select only certain HIT types to finish.  Corresponds to a ProtoHIT's hitTypeID.  If blank, this method finishes all reservations.
+- _apiKey_: Optional access guard.
 
 **Result**
 

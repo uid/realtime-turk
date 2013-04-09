@@ -3,7 +3,6 @@ from django.views.decorators.csrf import csrf_exempt
 import simplejson as json
 
 from settings import PING_TIMEOUT_SECONDS
-#import cron # this is my cron module+function, nothing built-in
 
 from retainer.models import *
 from retainer.utils.request_utils import checkRequestParams
@@ -31,8 +30,6 @@ def make(request):
            done = False, \
            invoked = False)
        resv.save()
-       
-       #cron.cron()
        
        return HttpResponse(resv.id)
    except ProtoHit.DoesNotExist:
@@ -106,10 +103,16 @@ def unfinish(request):
 @csrf_exempt
 def finishAll(request):
     # mark a reservation as successfully finished
-    if not checkRequestParams(request, ['apiKey']):
+    if not checkRequestParams(request, ['apiKey', 'hitType']):
         return HttpResponse('Bad params')
     
-    resvs = WorkReservation.objects.all()
+    params = request.POST
+    
+    if params['hitType'] == '':
+        resvs = WorkReservation.objects.all()
+    else:
+        resvs = WorkReservation.objects.filter(proto__hit_type_id = params['hitType'])
+            
     for resv in resvs:
         resv.done = True
         resv.save()
@@ -123,9 +126,10 @@ def list(request):
     
     resvs = []
     
-    for resv in WorkReservation.objects.all():
+    for resv in WorkReservation.objects.order_by('-id')[:25]:
         resvs.append(resv.objectify)
-        
+    
+    #resvs.reverse() # all of this interesting ordering stuff is so the newest 25 reservations are at the top
     data = json.dumps(resvs)
     
     return HttpResponse(data)
