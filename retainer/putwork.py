@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import simplejson
 from retainer.models import *
+from retainer.utils.request_utils import checkRequestParams
 
 @csrf_exempt
 def put_work(request):
@@ -24,6 +25,20 @@ def put_work(request):
             return HttpResponse('id must be specified')
     elif request.method == 'GET':
         return HttpResponse('Bad request type.')
+        
+@csrf_exempt
+def toggle_sandbox(request):
+    if not checkRequestParams(request, ['apiKey', 'id', 'value']):
+        return HttpResponse('Bad params')
+    
+    params = request.POST
+    try:
+        proto = ProtoHit.objects.get(id = int(params['id']))
+        proto.sandbox = bool(params.value)
+        proto.save()
+        return HttpResponse('OK')
+    except ProtoHIT.DoesNotExist:
+        return HttpResponse('ProtoHIT.DoesNotExist')
 
 @csrf_exempt
 def finish_work(request):

@@ -1,5 +1,5 @@
 var
-	server = 'http://crowdy.csail.mit.edu/retainer/',
+	server = 'http://crowdy.csail.mit.edu:8000/retainer/',
 	reservations = [],
 	reservationMap = {},
 	hitTypes = []
@@ -10,6 +10,7 @@ $(init)
 function init(){
 	setInterval(updateData, 3000)
 	initData()
+	setTimeout(initSandboxData, 1000)
 	
 	$('#btn-complete-all-resvs').click(onClickMarkAll)
 }
@@ -18,6 +19,12 @@ function onClickMarkAll(type){
 	$.post(server + 'reservation/finish/all', { hitType: typeof type == 'string' ? type : '' }, function(){
 		updateData()
 	})
+	
+	$.post(server + 'toggleSandbox', { value: 0 }, function(){
+		updateData()
+	})
+	
+	return false
 }
 
 function updateHITTypes(){
@@ -25,20 +32,73 @@ function updateHITTypes(){
 	if($(types).not(hitTypes).length || $(hitTypes).not(types).length){
 		// then the types have changed
 		$('.hitType-btn').remove()
-		$('#controls').append($.map(types, function(e){ return hitTypeBtn(e) }))
+		$('#control-buttons').append($.map(types, function(e){ return hitTypeBtn(e) }))
 		hitTypes = types
 	}
 }
 
+function sandboxBtn(type, val){
+	var elem = $('<input />', {
+		id: 'sandbox-' + type,
+		type: 'checkbox', 
+		class: 'sandbox-checkbox',
+		click: function(e){
+			$.post(server + 'protohit/sandbox/set', {
+			    hitType: type,
+				sandbox: $('#sandbox-' + type).attr('checked') == 'checked'
+			})
+		}
+	})
+	
+	if(val){
+		elem.attr('checked', 'checked')
+	}
+	
+	return elem
+}
+
+function initSandboxData(){
+	$.each(hitTypes, function(i, e){
+		$.post(server + 'protohit/sandbox/get', {
+		    hitType: e
+		}, function(data){
+			var btn = sandboxBtn(e, data === 'true')
+			var label = $('<div />', { text: e + ': ' })
+			label.append(btn)
+			$('#sandbox-btns').append(label)
+		})
+	})
+}
+
+function updateSandboxData(){
+	$.each(hitTypes, function(i, e){
+		$.post(server + 'protohit/sandbox/get', {
+		    hitType: e
+		}, function(data){
+			if(data === 'true'){
+				$('#sandbox-' + e).attr('checked', 'checked')
+			} else {
+				$('#sandbox-' + e).removeAttr('checked')
+			}
+		})
+	})
+}
+
 function hitTypeBtn(type){
-	return $('<input />', {
-		type: 'button',
-		class: 'span2 hitType-btn',
-		value: type,
+	var li = $('<li />', {
+		class: ' span2 hitType-btn',
 		click: function(e){
 			onClickMarkAll(type)
 		}
 	})
+	
+	li.append($('<a />', {
+		text: type,
+		class: 'active',
+		href: '#'
+	}))
+	
+	return li
 }
 
 function initData(){
@@ -47,6 +107,7 @@ function initData(){
 
 function updateData(){
 	updateReservations()
+	updateSandboxData()
 }
 
 function initReservations(){

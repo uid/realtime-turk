@@ -17,6 +17,10 @@ h2 {
     font-weight: lighter;
 }
 
+.hitType-btn {
+	text-align: center;
+}
+
 .left {
 	margin-left: 0.1in;
 }

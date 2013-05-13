@@ -18,6 +18,7 @@
 		  })();
 		</script>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+		<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
 		<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha3.js"></script>
 		<script src="status.js"></script>
 	</head>
@@ -27,12 +28,16 @@
 			<em>Info about jobs on retainer.</em>
 		</p>
 		
-		<h2 class="left">Reservations</h2>
-		
-		<div id="controls" class="left row">
-			<div class="span2">Mark complete: </div>
-			<input type="button" id="btn-complete-all-resvs" class="span2" value="All" />
+		<div id="sandbox" class="left row">
+			<div class="span2"><strong>Sandbox mode: </strong><div id="sandbox-btns" /></div>
 		</div>
+		<div id="controls" class="left row">
+			<div class="span2"><strong>Mark complete: </strong></div>
+			<input type="button" id="btn-complete-all-resvs" class="span2" value="All" />
+			<ul id="control-buttons" class="nav nav-pills row"></ul>
+		</div>
+		
+		<h2 class="left">Reservations</h2>
 		<div id="reservations"></div>
 	</body>
 </html>

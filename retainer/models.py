@@ -62,6 +62,7 @@ class ProtoHit(models.Model):
     auto_approval_delay =   models.IntegerField(null=True, blank=True, default=86400)
     approval_rating =       models.IntegerField(default=0)
     worker_locale =         models.CharField(max_length=255, blank=True, default='')
+    sandbox =               models.BooleanField(default=True)
     
     @property
     def objectify(self):

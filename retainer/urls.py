@@ -20,6 +20,9 @@ urlpatterns = patterns('',
     url(r'^putwork/done$', 'retainer.putwork.finish_work'),
     url(r'^retainer/putwork/done$', 'retainer.putwork.finish_work'),
     
+    url(r'^toggleSandbox$', 'retainer.putwork.toggle_sandbox'),
+    url(r'^retainer/toggleSandbox$', 'retainer.putwork.toggle_sandbox'),
+    
     url(r'^reservation/make$', 'retainer.reservation.make'),
     url(r'^retainer/reservation/make$', 'retainer.reservation.make'),
     
@@ -40,6 +43,13 @@ urlpatterns = patterns('',
     
     url(r'^reservation/finish/all$', 'retainer.reservation.finishAll'),
     url(r'^retainer/reservation/finish/all$', 'retainer.reservation.finishAll'),
+    
+    
+    url(r'^protohit/sandbox/get$', 'retainer.sandbox.status'),
+    url(r'^retainer/protohit/sandbox/get$', 'retainer.sandbox.status'),
+    
+    url(r'^protohit/sandbox/set$', 'retainer.sandbox.toggle'),
+    url(r'^retainer/protohit/sandbox/set$', 'retainer.sandbox.toggle'),
     # Examples:
     # url(r'^$', 'retainer.views.home', name='home'),
     # url(r'^retainer/', include('retainer.foo.urls')),
