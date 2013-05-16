@@ -24,14 +24,22 @@ ACTIVE_HIT_NUM = 7
 
 active_hits = []
 
-def forever():
-    print "postHITs process started"
-    mt_conn = get_mt_conn(True) # get_mt_conn(proto.sandbox)
-    while True:
-        postHITs(mt_conn)
-        trimHITs(mt_conn)
+mt_conn_real = get_mt_conn(False)
+mt_conn_sandbox = get_mt_conn(True)
 
-def postHITs(mt_conn):
+def forever():
+    global mt_conn_sandbox
+    global mt_conn_real
+        
+    mt_conn_real = get_mt_conn(False)
+    mt_conn_sandbox = get_mt_conn(True)
+
+    print "postHITs process started"
+    while True:
+        postHITs()
+        trimHITs()
+
+def postHITs():
     global active_hits
     startTime = datetime.utcnow()
     
@@ -50,9 +58,9 @@ def postHITs(mt_conn):
             for reservation in reservations:
                 numOnRetainer = len(reservation.workers)
             
-                if unixtime(datetime.now()) > (reservation.start_time + settings.RESERVATION_TIMEOUT_MINUTES * 60 * 10):
-                    print 'not yet expiring: ' + str(reservation)
-                    #break
+                if unixtime(datetime.now()) > (reservation.start_time + settings.RESERVATION_TIMEOUT_MINUTES * 60 * 20):
+                    #print 'not yet expiring: ' + str(reservation)
+                    break
                 
                 # how many HITs are we already maintaining for this reservation?
                 existing_hits = Hit.objects.filter(reservation = reservation, removed = False)
@@ -60,18 +68,23 @@ def postHITs(mt_conn):
                 
                 #print 'existing hits: ' + str(existing_hits)
             
-                hit = postHIT(mt_conn, reservation, seq)
+                hit = postHIT(reservation, seq)
                 active_hits.append(hit)
     
 
-def trimHITs(mt_conn):
+def trimHITs():
     global active_hits
     new_active_hits = []
     for hit in active_hits:
         if unixtime(datetime.utcnow()) > hit.creation_time + 60 * 3:
             try:
                 print 'removing old HIT: ' + hit.hit_id
-                mt_conn.expire_hit(hit.hit_id)
+                
+                if hit.sandbox:
+                    mt_conn_sandbox.expire_hit(hit.hit_id)
+                else:
+                    mt_conn_real.expire_hit(hit.hit_id)
+                
                 hit.removed = True
                 hit.save()
             except Exception, e:
@@ -82,7 +95,7 @@ def trimHITs(mt_conn):
     active_hits = new_active_hits
             
 
-def postHIT(mt_conn, resv, seq):
+def postHIT(resv, seq):
     proto = resv.proto
     
     qual_arr = []
@@ -107,7 +120,10 @@ def postHIT(mt_conn, resv, seq):
                      qualifications = quals,
                      auto_approval_delay = proto.auto_approval_delay)
     try:
-        turk_hit = eh.post(mt_conn)
+        if proto.sandbox:
+            turk_hit = eh.post(mt_conn_sandbox)
+        else:
+            turk_hit = eh.post(mt_conn_real)    
         print "Posted HIT ID " + turk_hit.HITId + " for reservation: " + str(resv)
             
         django_hit = Hit(proto_id = proto.id,
@@ -125,7 +141,8 @@ def postHIT(mt_conn, resv, seq):
                           auto_approval_delay = proto.auto_approval_delay,
                           worker_locale = proto.worker_locale,
                           approval_rating = proto.approval_rating,
-                          creation_time = unixtime(datetime.utcnow()))
+                          creation_time = unixtime(datetime.utcnow()),
+                          sandbox = proto.sandbox)
         django_hit.save()
         return django_hit
             
@@ -133,5 +150,5 @@ def postHIT(mt_conn, resv, seq):
         print "Got exception posting HIT:\n" + str(e)
 
 if __name__ == '__main__':
-    with daemon.DaemonContext():
-        forever()
+    #with daemon.DaemonContext():
+    forever()

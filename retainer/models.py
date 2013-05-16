@@ -44,6 +44,7 @@ class Hit(models.Model):
     worker_locale =         models.CharField(max_length=255, blank=True)
     paid =                  models.BooleanField(default=False)
     removed =               models.BooleanField(default=False)
+    sandbox =               models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.hit_id
