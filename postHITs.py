@@ -150,5 +150,5 @@ def postHIT(resv, seq):
         print "Got exception posting HIT:\n" + str(e)
 
 if __name__ == '__main__':
-    #with daemon.DaemonContext():
-    forever()
+    with daemon.DaemonContext():
+        forever()
